@@ -1,0 +1,31 @@
+{
+    "timestamp": "number",
+    "entity": { "gateway_id": "string", "location": "string" },
+    "contextAttribute": "string",
+    "resource": {
+        "device_id": "string",
+        "sensor_id": "string",
+        "device_name": "string"
+    },
+    "refreshRate": "number",
+    "sla": {},
+    "privacy_filter": "boolean",
+    "contextValue": {
+        "event": "string",
+        "count": "number",
+        "detections": [
+            {
+                "id": "number",
+                "label": "string",
+                "position_m": {
+                    "x": "number",
+                    "y": "number",
+                    "z": "number"
+                },
+                "distance_m": "number",
+                "confidence": "number",
+                "tracking_state": "string"
+            }
+        ]
+    }
+}

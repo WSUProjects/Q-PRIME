@@ -1,0 +1,91 @@
+sensor_label,sensor_name,storage_location,score_edge,score_cloud,privacy_weight
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.435,0.20,0.60
+Misty Robot,misty_vision,Edge,0.60,0.20,0.60
+Misty Robot,misty_vision,Edge,0.45,0.20,0.60
+Misty Robot,misty_vision,Edge,0.60,0.20,0.60
+Misty Robot,misty_vision,Edge,0.60,0.20,0.60
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+Tello Drone,tello_vision,Edge,null,null,0.80
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+ZED 2i,zed_vision,Edge,0.35,0.30,0.50
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.19,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.19,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.19,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+THP,thp,Cloud,0.19,0.42,0.20
+THP,thp,Cloud,0.34,0.42,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 1,door_1,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Cloud,0.29,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Cloud,0.29,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Cloud,0.29,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Cloud,0.29,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Edge,0.54,0.30,0.20
+Door Sensor 2,door_2,Cloud,0.29,0.30,0.20

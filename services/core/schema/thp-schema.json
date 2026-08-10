@@ -1,0 +1,22 @@
+{
+    "contextAttribute": "string",
+    "contextValue": {
+        "battery": "number",
+        "device_temperature": "number",
+        "humidity": "number",
+        "linkquality": "number",
+        "power_outage_count": "number",
+        "pressure": "number",
+        "temperature": "number",
+        "voltage": "number"
+    },
+    "entity": { "gateway_id": "string", "location": "string" },
+    "privacy_filter": "boolean",
+    "refreshRate": "number",
+    "resource": {
+        "device_id": "string",
+        "device_name": "string"
+    },
+    "sla": {},
+    "timestamp": "number"
+}

@@ -1,0 +1,54 @@
+[
+    {
+        "Name": "timestamp",
+        "Type": "int"
+    },
+    {
+        "Name": "gateway_id",
+        "Type": "string"
+    },
+    {
+        "Name": "device_name",
+        "Type": "string"
+    },
+    {
+        "Name": "device_id",
+        "Type": "string"
+    },
+    {
+        "Name": "temperature",
+        "Type": "double"
+    },
+    {
+        "Name": "event",
+        "Type": "string"
+    },
+    {
+        "Name": "type",
+        "Type": "int"
+    },
+    {
+        "Name": "ip_address",
+        "Type": "string"
+    },
+    {
+        "Name": "sensor_id",
+        "Type": "string"
+    },
+    {
+        "Name": "person",
+        "Type": "string"
+    },
+    {
+        "Name": "yaw",
+        "Type": "int"
+    },
+    {
+        "Name": "pitch",
+        "Type": "int"
+    },
+    {
+        "Name": "distance",
+        "Type": "int"
+    }
+]

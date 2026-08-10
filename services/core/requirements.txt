@@ -1,0 +1,9 @@
+flask==3.0.3
+python-dotenv==1.0.1
+gunicorn==22.0.0
+pymongo==4.10.1
+boto3==1.35.76
+cryptography==43.0.3
+requests==2.32.3
+presto-python-client==0.8.4
+sqlglot==26.2.1

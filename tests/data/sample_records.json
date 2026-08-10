@@ -1,0 +1,182 @@
+[
+    {
+        "entity": {
+            "gateway_id": "edge-node-3",
+            "location": "sdc-lab"
+        },
+        "contextAttribute": "tello_vision",
+        "contextValue": {
+            "box_id": "72829587877a4336abc0590f3451d721",
+            "id": "e06d987c-93eb-4dde-aad5-9d1923b10183",
+            "roi_id": "roiID_0",
+            "type": 1,
+            "bboxs": [
+                {
+                    "x": 3256,
+                    "y": 4144
+                },
+                {
+                    "x": 4227,
+                    "y": 9290
+                }
+            ],
+            "human_count": 1,
+            "detections": [
+                {
+                    "type": "person",
+                    "name": "Arthur Bray",
+                    "age": 39,
+                    "gender": "Male",
+                    "ssn": "055-51-8227",
+                    "confidence": 0.62,
+                    "x": 130,
+                    "y": -5
+                }
+            ],
+            "is_pushed": true
+        },
+        "refreshRate": 1000,
+        "timestamp": 1756364741,
+        "resource": {
+            "device_id": "92f4d0e3-6940-49d4-9d2f-4f049aba10ed",
+            "ip_address": "192.168.11.106",
+            "device_name": "Tello Drone 1"
+        },
+        "sla": null,
+        "privacy_filter": true
+    },
+    {
+        "contextAttribute": "misty_vision",
+        "contextValue": {
+            "distance": 56,
+            "event": "familiar_face_detected",
+            "person": "Alice",
+            "pitch": -5,
+            "yaw": 0
+        },
+        "entity": {
+            "gateway_id": "edge-node-4",
+            "location": "sdc-lab"
+        },
+        "privacy_filter": false,
+        "refreshRate": 1000,
+        "resource": {
+            "device_id": "misty_03953",
+            "device_name": "Misty Robot 1",
+            "ip_address": "192.168.50.131",
+            "sensor_id": "cv"
+        },
+        "sla": null,
+        "timestamp": 1763459860
+    },
+    {
+        "contextAttribute": "door",
+        "contextValue": {
+            "battery": 100,
+            "contact": true,
+            "device_temperature": 25,
+            "linkquality": 255,
+            "power_outage_count": 16,
+            "state": "OFF",
+            "voltage": 3141,
+            "event": "closed"
+        },
+        "entity": { "gateway_id": "edge-node-5", "location": "sdc-lab" },
+        "privacy_filter": false,
+        "refreshRate": 1000,
+        "resource": {
+            "device_id": "0x54ef44100140b96b",
+            "device_name": "LabDoorSensor_1"
+        },
+        "sla": null,
+        "timestamp": 1763520531
+    },
+    {
+        "contextAttribute": "door",
+        "contextValue": {
+            "battery": 100,
+            "contact": false,
+            "device_temperature": 25,
+            "linkquality": 255,
+            "power_outage_count": 11,
+            "state": "OFF",
+            "voltage": 3323,
+            "event": "opened"
+        },
+        "entity": { "gateway_id": "edge-node-5", "location": "sdc-lab" },
+        "privacy_filter": false,
+        "refreshRate": 1000,
+        "resource": {
+            "device_id": "0x54ef44100140b5ed",
+            "device_name": "LabDoorSensor_2"
+        },
+        "sla": null,
+        "timestamp": 1763520904
+    },
+    {
+        "contextAttribute": "thp",
+        "contextValue": {
+            "battery": 100,
+            "device_temperature": 26,
+            "humidity": 58.41,
+            "linkquality": 255,
+            "power_outage_count": 17,
+            "pressure": 1003.5,
+            "temperature": 27.37,
+            "voltage": 3151
+        },
+        "entity": { "gateway_id": "edge-node-5", "location": "sdc-lab" },
+        "privacy_filter": false,
+        "refreshRate": 1000,
+        "resource": {
+            "device_id": "0x54ef4410012f25d2",
+            "device_name": "LabTHPSensor"
+        },
+        "sla": null,
+        "timestamp": 1763522778
+    },
+
+    {
+        "timestamp": 1765325209,
+        "entity": { "gateway_id": "edge-node-6", "location": "sdc-lab" },
+        "contextAttribute": "zed_vision",
+        "resource": {
+            "device_id": "zed2i-001",
+            "sensor_id": "cv",
+            "device_name": "ZED2i"
+        },
+        "refreshRate": 1000,
+        "sla": null,
+        "privacy_filter": false,
+        "contextValue": {
+            "event": "persons_detected",
+            "count": 2,
+            "detections": [
+                {
+                    "id": 7,
+                    "label": "PERSON",
+                    "position_m": {
+                        "x": 0.052521947771310806,
+                        "y": 0.009878728538751602,
+                        "z": 0.08377471566200256
+                    },
+                    "distance_m": 0.09887748976355376,
+                    "confidence": 54.1015625,
+                    "tracking_state": "OK"
+                },
+                {
+                    "id": 12,
+                    "label": "PERSON",
+                    "position_m": {
+                        "x": 0.7921569347381592,
+                        "y": 0.13986746966838837,
+                        "z": 1.0850250720977783
+                    },
+                    "distance_m": 1.3434254785192015,
+                    "confidence": 67.48046875,
+                    "tracking_state": "OFF"
+                }
+            ]
+        }
+    }
+]

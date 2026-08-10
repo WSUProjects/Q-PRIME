@@ -1,0 +1,48 @@
+{
+    "latency_unit": "ms",
+    "default_latency_threshold_ms": 30,
+    "latency_thresholds": {
+        "zed_vision": 800,
+        "misty_vision": 810,
+        "tello_vision": 1000,
+        "door": 650,
+        "thp": 650,
+        "soil": 800,
+        "heart": 500,
+        "smoke": 500,
+        "camera_vision": 900
+    },
+    "pass_threshold": 0.6,
+    "default_privacy_weight": 0.0,
+    "privacy_weights": {
+        "misty_vision": 0.6,
+        "zed_vision": 0.5,
+        "door": 0.2,
+        "thp": 0.2,
+        "tello_vision": 0.8,
+        "soil": 0.1,
+        "heart": 0.9,
+        "smoke": 0.1,
+        "camera_vision": 0.7
+    },
+    "weight_mode": "per_sensor",
+    "criteria_weights": {
+        "zed_vision": { "temporal": 0.3, "spatial": 0.3, "privacy": 0.4 },
+        "misty_vision": { "temporal": 0.3, "spatial": 0.2, "privacy": 0.5 },
+        "tello_vision": { "temporal": 0.3, "spatial": 0.2, "privacy": 0.5 },
+        "door": { "temporal": 0.5, "spatial": 0.3, "privacy": 0.2 },
+        "thp": { "temporal": 0.3, "spatial": 0.5, "privacy": 0.2 },
+        "soil": { "temporal": 0.3, "spatial": 0.5, "privacy": 0.2 },
+        "heart": { "temporal": 0.4, "spatial": 0.2, "privacy": 0.4 },
+        "smoke": { "temporal": 0.5, "spatial": 0.3, "privacy": 0.2 },
+        "camera_vision": { "temporal": 0.3, "spatial": 0.3, "privacy": 0.4 }
+    },
+    "global_criteria_weights": { "temporal": 0.3333, "spatial": 0.3333, "privacy": 0.3334 },
+    "ahp_matrix": [
+        [1.0, 1.0, 1.0],
+        [1.0, 1.0, 1.0],
+        [1.0, 1.0, 1.0]
+    ],
+    "privacy_floor": 0.0,
+    "strict_privacy_all_pii": false
+}

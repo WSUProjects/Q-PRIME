@@ -1,0 +1,46 @@
+{
+    "contextAttribute": "string",
+    "contextValue": {
+        "box_id": "string",
+        "id": "string",
+        "roi_id": "string",
+        "type": "number",
+        "bboxs": [
+            {
+                "x": "number",
+                "y": "number"
+            },
+            {
+                "x": "number",
+                "y": "number"
+            }
+        ],
+        "human_count": 1,
+        "detections": [
+            {
+                "type": "string",
+                "name": "string",
+                "age": "number",
+                "gender": "string",
+                "ssn": "string",
+                "confidence": "number",
+                "x": "number",
+                "y": "number"
+            }
+        ],
+        "is_pushed": "boolean"
+    },
+    "entity": {
+        "gateway_id": "string",
+        "location": "string"
+    },
+    "privacy_filter": "boolean",
+    "refreshRate": "number",
+    "resource": {
+        "device_id": "string",
+        "device_name": "string",
+        "ip_address": "string"
+    },
+    "sla": {},
+    "timestamp": "number"
+}

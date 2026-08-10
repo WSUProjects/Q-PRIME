@@ -1,0 +1,24 @@
+{
+    "contextAttribute": "string",
+    "contextValue": {
+        "distance": "number",
+        "event": "string",
+        "person": "string",
+        "pitch": "number",
+        "yaw": "number"
+    },
+    "entity": {
+        "gateway_id": "string",
+        "location": "string"
+    },
+    "privacy_filter": "boolean",
+    "refreshRate": "number",
+    "resource": {
+        "device_id": "string",
+        "device_name": "string",
+        "ip_address": "string",
+        "sensor_id": "string"
+    },
+    "sla": {},
+    "timestamp": "number"
+}

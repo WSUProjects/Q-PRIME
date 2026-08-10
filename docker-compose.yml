@@ -1,0 +1,368 @@
+# Q-PRIME — complete stack, zero configuration.
+#
+#   docker compose up -d --build
+#
+# No .env file is required: every variable below carries a working default.
+# `.env` only exists to remap host ports, tune the bundled device feed, or
+# enable the optional local LLM. AWS is configured from the dashboard.
+#
+# Container names are all prefixed `qprime-` so an unrelated EdgeX, MongoDB or
+# Mosquitto deployment on the same host cannot collide with this stack. Host
+# ports are equally overridable — see `.env.example`.
+name: qprime
+
+x-edgex-common: &edgex-common
+  networks: [qprime]
+  restart: unless-stopped
+  security_opt: [no-new-privileges:true]
+
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: qprime-mongodb
+    command: ["mongod", "--bind_ip_all"]
+    networks: [qprime]
+    ports:
+      - "127.0.0.1:${MONGODB_PORT:-27017}:27017"
+    volumes:
+      - qprime-mongodb-data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  presto:
+    build: ./infra/presto
+    image: qprime-presto:0.286
+    container_name: qprime-presto
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks: [qprime]
+    # 8080 is heavily contested on developer machines, so the SQL engine is
+    # published on 8085 by default.
+    ports:
+      - "127.0.0.1:${PRESTO_PORT:-8085}:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/v1/info >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  edgex-postgres:
+    <<: *edgex-common
+    image: postgres:16.3-alpine
+    container_name: qprime-edgex-postgres
+    hostname: edgex-postgres
+    environment:
+      POSTGRES_DB: edgex_db
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - edgex-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d edgex_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  edgex-mqtt-broker:
+    <<: *edgex-common
+    image: eclipse-mosquitto:2.0.22
+    container_name: qprime-edgex-mqtt-broker
+    hostname: edgex-mqtt-broker
+    command: ["/usr/sbin/mosquitto", "-c", "/mosquitto-no-auth.conf"]
+    # 1883 is usually taken by a host Mosquitto; publish on 1884 instead.
+    ports:
+      - "127.0.0.1:${EDGEX_MQTT_PORT:-1884}:1883"
+
+  edgex-core-keeper:
+    <<: *edgex-common
+    image: edgexfoundry/core-keeper:4.0.2
+    container_name: qprime-edgex-core-keeper
+    hostname: edgex-core-keeper
+    depends_on:
+      edgex-postgres:
+        condition: service_healthy
+      edgex-mqtt-broker:
+        condition: service_started
+    environment:
+      DATABASE_HOST: edgex-postgres
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      MESSAGEBUS_AUTHMODE: none
+      MESSAGEBUS_HOST: edgex-mqtt-broker
+      MESSAGEBUS_PORT: "1883"
+      MESSAGEBUS_PROTOCOL: tcp
+      MESSAGEBUS_SECRETNAME: ""
+      MESSAGEBUS_TYPE: mqtt
+      SERVICE_HOST: edgex-core-keeper
+    ports:
+      - "127.0.0.1:${EDGEX_KEEPER_PORT:-59890}:59890"
+
+  edgex-core-common-config-bootstrapper:
+    <<: *edgex-common
+    image: edgexfoundry/core-common-config-bootstrapper:4.0.2
+    container_name: qprime-edgex-core-common-config-bootstrapper
+    hostname: edgex-core-common-config-bootstrapper
+    command: ["/core-common-config-bootstrapper", "--registry", "-cp=keeper.http://edgex-core-keeper:59890"]
+    depends_on:
+      edgex-core-keeper:
+        condition: service_started
+    environment:
+      ALL_SERVICES_DATABASE_HOST: edgex-postgres
+      ALL_SERVICES_MESSAGEBUS_HOST: edgex-mqtt-broker
+      ALL_SERVICES_REGISTRY_HOST: edgex-core-keeper
+      APP_SERVICES_CLIENTS_CORE_METADATA_HOST: edgex-core-metadata
+      DEVICE_SERVICES_CLIENTS_CORE_METADATA_HOST: edgex-core-metadata
+      EDGEX_SECURITY_SECRET_STORE: "false"
+
+  edgex-core-metadata:
+    <<: *edgex-common
+    image: edgexfoundry/core-metadata:4.0.2
+    container_name: qprime-edgex-core-metadata
+    hostname: edgex-core-metadata
+    command: ["--registry", "-cp=keeper.http://edgex-core-keeper:59890"]
+    depends_on:
+      edgex-core-common-config-bootstrapper:
+        condition: service_started
+      edgex-core-keeper:
+        condition: service_started
+      edgex-postgres:
+        condition: service_healthy
+    environment:
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      SERVICE_HOST: edgex-core-metadata
+    ports:
+      - "127.0.0.1:${EDGEX_METADATA_PORT:-59881}:59881"
+
+  edgex-core-data:
+    <<: *edgex-common
+    image: edgexfoundry/core-data:4.0.2
+    container_name: qprime-edgex-core-data
+    hostname: edgex-core-data
+    command: ["--registry", "-cp=keeper.http://edgex-core-keeper:59890"]
+    depends_on:
+      edgex-core-common-config-bootstrapper:
+        condition: service_started
+      edgex-core-keeper:
+        condition: service_started
+      edgex-postgres:
+        condition: service_healthy
+    environment:
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      SERVICE_HOST: edgex-core-data
+    ports:
+      - "127.0.0.1:${EDGEX_DATA_PORT:-59880}:59880"
+
+  edgex-core-command:
+    <<: *edgex-common
+    image: edgexfoundry/core-command:4.0.2
+    container_name: qprime-edgex-core-command
+    hostname: edgex-core-command
+    command: ["--registry", "-cp=keeper.http://edgex-core-keeper:59890"]
+    depends_on:
+      edgex-core-common-config-bootstrapper:
+        condition: service_started
+      edgex-core-keeper:
+        condition: service_started
+      edgex-core-metadata:
+        condition: service_started
+      edgex-postgres:
+        condition: service_healthy
+    environment:
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      EXTERNALMQTT_URL: tcp://edgex-mqtt-broker:1883
+      SERVICE_HOST: edgex-core-command
+    ports:
+      - "127.0.0.1:${EDGEX_COMMAND_PORT:-59882}:59882"
+
+  edgex-device-rest:
+    <<: *edgex-common
+    image: edgexfoundry/device-rest:4.0.2
+    container_name: qprime-edgex-device-rest
+    hostname: edgex-device-rest
+    command: ["-cp=keeper.http://edgex-core-keeper:59890", "--registry"]
+    depends_on:
+      edgex-core-common-config-bootstrapper:
+        condition: service_started
+      edgex-core-data:
+        condition: service_started
+      edgex-core-keeper:
+        condition: service_started
+      edgex-core-metadata:
+        condition: service_started
+    environment:
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      SERVICE_HOST: edgex-device-rest
+    ports:
+      - "127.0.0.1:${EDGEX_DEVICE_REST_PORT:-59986}:59986"
+
+  qprime-analysis:
+    container_name: qprime-analysis
+    build: ./services/core
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      presto:
+        condition: service_started
+      edgex-core-metadata:
+        condition: service_started
+    networks: [qprime]
+    environment:
+      QPRIME_ANALYSIS_PORT: "5005"
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-qprime}
+      PRESTO_URL: http://presto:8080
+      EDGEX_METADATA_URL: http://edgex-core-metadata:59881
+      QPRIME_PRODUCER_URL: http://qprime-devices:5010
+      QPRIME_CONFIG_KEY_PATH: /var/lib/qprime/secrets/aws-config.key
+    ports:
+      - "${QPRIME_ANALYSIS_PORT:-5005}:5005"
+    volumes:
+      - qprime-core-secrets:/var/lib/qprime/secrets
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:5005/')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  edgex-qprime-export:
+    <<: *edgex-common
+    image: edgexfoundry/app-service-configurable:4.0.2
+    container_name: qprime-edgex-export
+    hostname: edgex-qprime-export
+    command: ["--registry", "--overwrite", "-cp=keeper.http://edgex-core-keeper:59890"]
+    depends_on:
+      edgex-core-common-config-bootstrapper:
+        condition: service_started
+      edgex-core-keeper:
+        condition: service_started
+      edgex-core-metadata:
+        condition: service_started
+      qprime-analysis:
+        condition: service_healthy
+    environment:
+      EDGEX_PROFILE: http-export
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      EDGEX_SERVICE_KEY: app-http-export-qprime
+      SERVICE_HOST: edgex-qprime-export
+      WRITABLE_LOGLEVEL: INFO
+      WRITABLE_PIPELINE_EXECUTIONORDER: HTTPExport
+      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORT_PARAMETERS_METHOD: post
+      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORT_PARAMETERS_URL: http://qprime-analysis:5005/api/ingest/edgex
+    ports:
+      - "127.0.0.1:${EDGEX_QPRIME_EXPORT_PORT:-59704}:59704"
+
+  # Official EdgeX management console.
+  edgex-ui:
+    <<: *edgex-common
+    image: edgexfoundry/edgex-ui:4.0.2
+    container_name: qprime-edgex-ui
+    hostname: edgex-ui
+    depends_on:
+      edgex-core-metadata:
+        condition: service_started
+    environment:
+      EDGEX_SECURITY_SECRET_STORE: "false"
+      SERVICE_HOST: edgex-ui
+    ports:
+      - "127.0.0.1:${EDGEX_UI_PORT:-4000}:4000"
+
+  # User-controlled Simulator and Sample EdgeX feed. It starts idle, so the
+  # stack never generates data until a user starts exactly one mode in /qprime.
+  qprime-devices:
+    container_name: qprime-devices
+    build: ./services/devices
+    depends_on:
+      qprime-analysis:
+        condition: service_healthy
+    networks: [qprime]
+    environment:
+      QPRIME_CORE_URL: http://qprime-analysis:5005
+      EDGEX_METADATA_URL: http://edgex-core-metadata:59881
+      EDGEX_DEVICE_REST_URL: http://edgex-device-rest:59986
+      QPRIME_SAMPLE_RATE_PER_MIN: ${QPRIME_SAMPLE_RATE_PER_MIN:-60}
+    restart: unless-stopped
+
+  qprime-nlp:
+    container_name: qprime-nlp
+    build: ./services/nlp
+    depends_on:
+      qprime-analysis:
+        condition: service_healthy
+    networks: [qprime]
+    environment:
+      QUERY_API_URL: http://qprime-analysis:5005/api/query
+      CONTINUUM_DB: ${CONTINUUM_DB:-qprime}
+      CONTINUUM_TABLE: ${CONTINUUM_TABLE:-continuum}
+      EPOCH_SCALE: ${EPOCH_SCALE:-s}
+      LOCAL_TZ_NAME: ${LOCAL_TZ_NAME:-Australia/Sydney}
+      # Rule-based SQL and summaries are the default. Set these to 1 and start
+      # the `llm` profile to route through a local model instead.
+      USE_LLM_SQL: ${USE_LLM_SQL:-}
+      USE_LLM_SUMMARY: ${USE_LLM_SUMMARY:-}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://ollama:11434}
+      MODEL: ${MODEL:-qwen2.5:7b-instruct-q4_K_M}
+    ports:
+      - "${QPRIME_NLP_PORT:-5500}:5500"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:5500/api/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  qprime-query:
+    container_name: qprime-query
+    build:
+      context: ./services/nlp-web
+      args:
+        NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
+        NEXT_PUBLIC_SQL_TABLE_NAME: ${NEXT_PUBLIC_SQL_TABLE_NAME:-qprime.continuum}
+    depends_on:
+      qprime-analysis:
+        condition: service_healthy
+      qprime-nlp:
+        condition: service_healthy
+      qprime-devices:
+        condition: service_started
+    networks: [qprime]
+    environment:
+      LLM_API: http://qprime-nlp:5500
+      QUERY_API_URL: http://qprime-analysis:5005/api/query
+      QPRIME_API_URL: http://qprime-analysis:5005
+    ports:
+      - "${QPRIME_WEB_PORT:-3000}:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  ollama:
+    container_name: qprime-ollama
+    image: ollama/ollama:latest
+    profiles: [llm]
+    networks: [qprime]
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+
+networks:
+  # Deliberately unnamed: Compose namespaces it as `qprime_qprime`. A hardcoded
+  # network name collides with any other Compose project that claims the same
+  # one — including the companion Q-PRIME-Simulator repository — and the whole
+  # stack then refuses to start.
+  qprime: {}
+
+volumes:
+  qprime-mongodb-data:
+  qprime-core-secrets:
+  edgex-postgres-data:
+  ollama-models:

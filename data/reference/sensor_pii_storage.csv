@@ -1,0 +1,7 @@
+sensor_label,sensor_name,has_pii,intended_edge,intended_cloud,actual_edge,actual_cloud
+Door Sensor 1,door_1,False,True,True,True,False
+Door Sensor 2,door_2,False,True,True,True,False
+Misty Robot, misty_vision,True,True,True,True,False
+Tello Drone,tello_vision,True,True,False,True,False
+THP,thp,False,True,True,False,True
+Zed 2i, zed_vision,True,True,True,True,False
