@@ -19,7 +19,7 @@ Scoring (as in the paper):
     S_edge  = w_temporal * QoC_temporal + w_privacy * P
     S_cloud = w_spatial  * QoC_spatial
 
-where ``P`` is the sensor's privacy weight in [0, 1]. Ties recommend Both.
+where ``P`` is the sensor's privacy weight in [0, 1]. Ties recommend Edge.
 """
 
 from typing import Any, Dict, List, Optional, Tuple
@@ -205,12 +205,10 @@ def decide(record: Dict[str, Any], runtime: RuntimeConfig) -> Dict[str, Any]:
     s_edge = w_temporal * qoc_temporal + w_privacy * privacy_weight
     s_cloud = w_spatial * qoc_spatial
 
-    if s_edge > s_cloud:
-        decision = "Edge"
-    elif s_cloud > s_edge:
+    if s_cloud > s_edge:
         decision = "Cloud"
     else:
-        decision = "Both"
+        decision = "Edge"
 
     explanation.update(
         {

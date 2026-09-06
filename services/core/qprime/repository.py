@@ -304,13 +304,18 @@ class MongoRepository:
             "device": "device_name",
             "stream": "contextattribute",
             "source": "source",
-            "recommendation": "recommended_tier",
             "backend": "actual_backends",
         }
         for source_key, mongo_key in mapping.items():
             value = filters.get(source_key)
             if value:
                 query[mongo_key] = value
+        recommendation = filters.get("recommendation")
+        if recommendation:
+            tier = str(recommendation).strip().lower()
+            query["recommended_tier"] = (
+                {"$in": ["edge", "both"]} if tier in {"edge", "both"} else tier
+            )
         if filters.get("pii") is not None:
             query["pii_detected"] = bool(filters["pii"])
         created: Dict[str, int] = {}

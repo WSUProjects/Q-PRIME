@@ -123,3 +123,28 @@ def test_ahp_mode_decision(sample_records):
     assert result["weight_source"] == "global_ahp"
     assert result["consistency_ratio"] is not None
     assert result["consistency_ratio"] < 0.10
+
+
+def test_equal_scores_resolve_to_edge():
+    """Equal scores use the journal's privacy-preserving Edge fallback."""
+    record = {
+        "contextAttribute": "unregistered",
+        "contextValue": {},
+        "resource": {},
+        "privacy_filter": False,
+        "sla": {
+            metric: {"score": 0.0}
+            for metric in (
+                "timeliness",
+                "completeness",
+                "correctness",
+                "resolution",
+                "significance",
+            )
+        },
+    }
+
+    result = decision.decide(record, runtime_config)
+
+    assert result["score_edge"] == result["score_cloud"] == 0.0
+    assert result["decision"] == "Edge"

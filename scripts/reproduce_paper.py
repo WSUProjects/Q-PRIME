@@ -86,7 +86,7 @@ def main():
         for _rec, res in run_pipeline(records):
             if res["pii_detected"]:
                 n_pii += 1
-                if res["decision"] in ("Cloud", "Both"):
+                if res["decision"] == "Cloud":
                     n_cloud += 1
         return n_pii, n_cloud
 

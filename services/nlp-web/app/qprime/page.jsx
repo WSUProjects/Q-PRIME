@@ -10,7 +10,7 @@ import { withBasePath } from "@/lib/basePath";
 import styles from "./qprime.module.css";
 
 const TABS = ["Overview", "QoC Factors", "Decisions", "Privacy", "Configuration", "Sensitivity", "Performance", "Data Sources"];
-const COLOURS = { edge: "#32c57a", cloud: "#4f8df7", both: "#f5a623" };
+const COLOURS = { edge: "#32c57a", cloud: "#4f8df7" };
 const empty = { overview: {}, qoc: { timeline: [], mean_by_device: {} }, decisions: [], privacy: {}, performance: {} };
 const PAPER_STREAMS = ["camera_vision", "door", "heart", "misty_vision", "smoke", "soil", "tello_vision", "thp", "zed_vision"];
 const CRITERIA = [["temporal", "Temporal QoC"], ["spatial", "Content QoC"], ["privacy", "Privacy"]];
@@ -67,13 +67,12 @@ function Overview({ data }) {
             <Metric label="Records processed" value={data.records_processed} />
             <Metric label="Stored at Edge" value={data.stored_at_edge} tone="edge" />
             <Metric label="Cloud decisions" value={data.sent_to_cloud} tone="cloud" />
-            <Metric label="Both tiers" value={data.both_tiers} tone="both" />
-            <Metric label="Cloud retained locally" value={data.cloud_fallback_records} tone="both" />
+            <Metric label="Cloud retained locally" value={data.cloud_fallback_records} tone="accent" />
             <Metric label="PII records" value={data.pii_records} />
         </div>
         <div className={styles.grid2}>
             <Panel title="Storage placement per device">
-                <ResponsiveContainer width="100%" height={330}><BarChart data={data.placement_by_device || []}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="device" angle={-18} textAnchor="end" height={80}/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="edge" stackId="a" fill={COLOURS.edge}/><Bar dataKey="cloud" stackId="a" fill={COLOURS.cloud}/><Bar dataKey="both" stackId="a" fill={COLOURS.both}/></BarChart></ResponsiveContainer>
+                <ResponsiveContainer width="100%" height={330}><BarChart data={data.placement_by_device || []}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="device" angle={-18} textAnchor="end" height={80}/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="edge" stackId="a" fill={COLOURS.edge}/><Bar dataKey="cloud" stackId="a" fill={COLOURS.cloud}/></BarChart></ResponsiveContainer>
             </Panel>
             <Panel title="Overall placement split">
                 <ResponsiveContainer width="100%" height={330}><PieChart><Pie data={split} dataKey="value" nameKey="name" innerRadius="48%" outerRadius="78%">{split.map((item) => <Cell key={item.name} fill={COLOURS[item.name] || "#8aa0c2"}/>)}</Pie><Tooltip/><Legend/></PieChart></ResponsiveContainer>
@@ -103,7 +102,7 @@ function Decisions({ rows }) {
 }
 
 function Privacy({ data }) {
-    return <><div className={styles.metrics}><Metric label="PII records" value={data.pii_records}/><Metric label="PII sent to configured AWS" value={data.pii_leaked_to_cloud} tone={data.pii_leaked_to_cloud ? "danger" : "edge"}/><Metric label="Leak rate" value={`${data.leak_rate || 0}%`}/><Metric label="Cloud fallback is local" value="MongoDB" tone="both"/></div><Panel title="PII placement per device"><ResponsiveContainer width="100%" height={350}><BarChart data={data.by_device || []}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="device"/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="pii_records" fill="#f5a623"/><Bar dataKey="leaked_to_cloud" fill="#e84455"/></BarChart></ResponsiveContainer></Panel></>;
+    return <><div className={styles.metrics}><Metric label="PII records" value={data.pii_records}/><Metric label="PII sent to configured AWS" value={data.pii_leaked_to_cloud} tone={data.pii_leaked_to_cloud ? "danger" : "edge"}/><Metric label="Leak rate" value={`${data.leak_rate || 0}%`}/><Metric label="Cloud fallback is local" value="MongoDB" tone="accent"/></div><Panel title="PII placement per device"><ResponsiveContainer width="100%" height={350}><BarChart data={data.by_device || []}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="device"/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="pii_records" fill="#f5a623"/><Bar dataKey="leaked_to_cloud" fill="#e84455"/></BarChart></ResponsiveContainer></Panel></>;
 }
 
 function DataSources({ producer, catalog, onSaved, onModeChange }) {
@@ -311,10 +310,10 @@ function Sensitivity() {
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
     async function replay() { try { setResult(await api("results/sensitivity", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ weights, privacy_floor: floor, force_pii_edge: force }) })); setError(""); } catch (e) { setError(e.message); } }
-    const chart = useMemo(() => ["edge", "cloud", "both"].map((tier) => ({ tier, original: result?.original?.[tier] || 0, replayed: result?.replayed?.[tier] || 0 })), [result]);
+    const chart = useMemo(() => ["edge", "cloud"].map((tier) => ({ tier, original: result?.original?.[tier] || 0, replayed: result?.replayed?.[tier] || 0 })), [result]);
     return <Panel title="What if the criteria weights were different?" subtitle="Replays logged decisions only; it does not re-ingest or move data">
         <div className={styles.sliders}>{Object.keys(weights).map((key) => <label key={key}>{key}<input type="range" min="0" max="1" step="0.01" value={weights[key]} onChange={(e) => setWeights({ ...weights, [key]: Number(e.target.value) })}/><strong>{weights[key].toFixed(2)}</strong></label>)}<label>Privacy floor<input type="number" min="0" max="1" step="0.05" value={floor} onChange={(e) => setFloor(Number(e.target.value))}/></label><label className={styles.check}><input type="checkbox" checked={force} onChange={(e) => setForce(e.target.checked)}/> Force Edge for all PII</label><button onClick={replay}>Replay placements</button>{error && <span className={styles.danger}>{error}</span>}</div>
-        {result && <><div className={styles.metrics}><Metric label="Replayed records" value={result.replayed_records}/><Metric label="Placements changed" value={result.placements_changed} tone="both"/><Metric label="PII cloud placements" value={result.pii_cloud_placements} tone={result.pii_cloud_placements ? "danger" : "edge"}/></div><ResponsiveContainer width="100%" height={330}><BarChart data={chart}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="tier"/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="original" fill="#94a3b8"/><Bar dataKey="replayed" fill="#990033"/></BarChart></ResponsiveContainer></>}
+        {result && <><div className={styles.metrics}><Metric label="Replayed records" value={result.replayed_records}/><Metric label="Placements changed" value={result.placements_changed} tone="accent"/><Metric label="PII cloud placements" value={result.pii_cloud_placements} tone={result.pii_cloud_placements ? "danger" : "edge"}/></div><ResponsiveContainer width="100%" height={330}><BarChart data={chart}><CartesianGrid stroke="#e2e8f0"/><XAxis dataKey="tier"/><YAxis allowDecimals={false}/><Tooltip/><Legend/><Bar dataKey="original" fill="#94a3b8"/><Bar dataKey="replayed" fill="#990033"/></BarChart></ResponsiveContainer></>}
     </Panel>;
 }
 

@@ -1,7 +1,7 @@
 """HTTP API for the Q-PRIME paper intelligence and placement pipeline.
 
 Direct producers and EdgeX events enter one QoC/privacy/AHP pipeline. Records
-are stored according to the resulting Edge/Cloud/Both decision and every
+are stored according to the resulting Edge/Cloud decision and every
 placement explanation is retained in MongoDB.
 """
 

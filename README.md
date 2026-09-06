@@ -211,7 +211,7 @@ Simulator (when started) ────────┐
 Sample EdgeX Feed (when started) ├─> Q-PRIME ingestion
 real device -> EdgeX -> export ──┘       -> QoC + privacy evaluation
                                          -> profile weights / AHP
-                                         -> Edge | Cloud | Both decision
+                                         -> Edge | Cloud decision
                                          -> MongoDB Edge collection
                                          -> AWS when configured, otherwise MongoDB Cloud fallback
 
@@ -246,10 +246,10 @@ S_edge  = w_temporal * QoC_temporal + w_privacy * P
 S_cloud = w_content  * QoC_content
 ```
 
-`P` is the stream's privacy weight in `[0, 1]`. **Edge** wins if `S_edge > S_cloud`,
-**Cloud** if `S_cloud > S_edge`, **Both** on a tie. Two overrides short-circuit
+`P` is the stream's privacy weight in `[0, 1]`. **Cloud** wins only if
+`S_cloud > S_edge`; **Edge** wins otherwise, including on a tie. Two overrides short-circuit
 scoring entirely: a record flagged `privacy_filter: strict`, and — when
-`strict_privacy_all_pii` is enabled — any record carrying PII. Both are pinned to
+`strict_privacy_all_pii` is enabled — any record carrying PII. Both overrides pin data to
 the edge.
 
 The five factors:

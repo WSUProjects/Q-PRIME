@@ -11,6 +11,28 @@ from .repository import MongoRepository, json_safe, repository
 METRICS = ("timeliness", "completeness", "correctness", "resolution", "significance")
 
 
+def _normalized_tier(value: Any) -> str:
+    tier = str(value or "unknown").lower()
+    return "edge" if tier == "both" else tier
+
+
+def _project_legacy_decision(document: Dict[str, Any]) -> Dict[str, Any]:
+    projected = dict(document)
+    if str(projected.get("recommended_tier") or "").lower() != "both":
+        return projected
+
+    projected["legacy_recommended_tier"] = projected["recommended_tier"]
+    projected["recommended_tier"] = "edge"
+    analysis = projected.get("analysis")
+    if isinstance(analysis, dict):
+        projected_analysis = dict(analysis)
+        if str(projected_analysis.get("decision") or "").lower() == "both":
+            projected_analysis["legacy_decision"] = projected_analysis["decision"]
+            projected_analysis["decision"] = "Edge"
+        projected["analysis"] = projected_analysis
+    return projected
+
+
 def _limit(value: Any, default: int = 200, maximum: int = 1000) -> int:
     try:
         return max(1, min(int(value), maximum))
@@ -36,23 +58,29 @@ class DashboardMetrics:
         )
         pii = db.placement_decisions.count_documents({"pii_detected": True})
         devices = self._placement_by("device_name")
+        edge_count = decisions.get("edge", 0) + decisions.get("both", 0)
         return {
             "records_processed": int(total),
-            "stored_at_edge": decisions.get("edge", 0),
+            "stored_at_edge": edge_count,
             "sent_to_cloud": decisions.get("cloud", 0),
-            "both_tiers": decisions.get("both", 0),
             "cloud_fallback_records": int(fallbacks),
             "pii_records": int(pii),
             "edge_records": self.repository.record_count("edge_records"),
             "cloud_records_retained": self.repository.record_count("cloud_records"),
-            "placement_split": decisions,
+            "placement_split": {
+                "edge": edge_count,
+                "cloud": decisions.get("cloud", 0),
+            },
             "placement_by_device": devices,
             "generated_at": int(time.time() * 1000),
         }
 
     def decisions(self, filters: Dict[str, Any], limit: Any = 200) -> Dict[str, Any]:
         rows = self.repository.placements(filters, _limit(limit))
-        return {"count": len(rows), "decisions": rows}
+        return {
+            "count": len(rows),
+            "decisions": [_project_legacy_decision(row) for row in rows],
+        }
 
     def qoc(self, limit: Any = 500) -> Dict[str, Any]:
         documents = list(
@@ -205,7 +233,7 @@ class DashboardMetrics:
         replayed_records = 0
         for document in documents:
             replayed_records += 1
-            prior = str(document.get("recommended_tier") or "unknown")
+            prior = _normalized_tier(document.get("recommended_tier"))
             original[prior] += 1
             analysis = document.get("analysis") or {}
             qoc = document.get("qoc") or {}
@@ -224,11 +252,11 @@ class DashboardMetrics:
                 privacy_weight = float(analysis.get("privacy_weight") or 0)
                 edge_score = normalized["temporal"] * temporal + normalized["privacy"] * privacy_weight
                 cloud_score = normalized["spatial"] * spatial
-                tier = "edge" if edge_score > cloud_score else "cloud" if cloud_score > edge_score else "both"
+                tier = "cloud" if cloud_score > edge_score else "edge"
             replayed[tier] += 1
             by_device[document.get("device_name") or "unknown"][tier] += 1
             changed += int(tier != prior)
-            pii_cloud += int(pii and tier in {"cloud", "both"})
+            pii_cloud += int(pii and tier == "cloud")
         return {
             "replayed_records": replayed_records,
             "placements_changed": changed,
@@ -249,8 +277,10 @@ class DashboardMetrics:
         grouped: Dict[str, Dict[str, Any]] = {}
         for row in rows:
             key = row["_id"].get("key") or "unknown"
-            grouped.setdefault(key, {"device": key, "edge": 0, "cloud": 0, "both": 0})
-            grouped[key][row["_id"].get("tier") or "unknown"] = int(row["count"])
+            grouped.setdefault(key, {"device": key, "edge": 0, "cloud": 0})
+            tier = _normalized_tier(row["_id"].get("tier"))
+            if tier in {"edge", "cloud"}:
+                grouped[key][tier] += int(row["count"])
         return list(grouped.values())
 
 

@@ -12,13 +12,12 @@ The overview shows the current persisted placement totals:
 - **Stored at Edge** — records recommended for Edge.
 - **Cloud decisions** — records recommended for Cloud; this is a placement
   recommendation count, not a guarantee of a successful external AWS write.
-- **Both tiers** — records recommended for Both.
 - **Cloud retained locally** — Cloud-recommended records held in MongoDB when
   AWS is unavailable or a configured write fails.
 - **PII records** — records whose payload contains detected PII.
 
 The two charts show stacked placement recommendations per device and the
-overall Edge/Cloud/Both split.
+overall Edge/Cloud split.
 
 ## QoC Factors
 

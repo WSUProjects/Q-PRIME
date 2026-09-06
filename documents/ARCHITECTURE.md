@@ -24,7 +24,7 @@ flowchart TB
         Policy[Resolve device, stream, or global policy]
         Evaluate[QoC baseline and five-factor evaluation]
         Privacy[PII detection and privacy controls]
-        Score[Criteria weights or AHP<br/>score Edge / Cloud / Both]
+        Score[Criteria weights or AHP<br/>score Edge / Cloud]
 
         CoreApi --> Ingest --> Policy --> Evaluate --> Privacy --> Score
     end
@@ -40,9 +40,9 @@ flowchart TB
         Evidence[(MongoDB<br/>placements, profiles, baselines, audit)]
     end
 
-    Score -->|Edge or Both| Edge
-    Score -->|Cloud or Both; AWS unavailable or write fails| LocalCloud
-    Score -->|Cloud or Both; AWS configured| AWS
+    Score -->|Edge| Edge
+    Score -->|Cloud; AWS unavailable or write fails| LocalCloud
+    Score -->|Cloud; AWS configured| AWS
     Score --> Evidence
     CoreApi -->|configuration and dashboard reads| Evidence
     Policy <--> Evidence
@@ -93,15 +93,14 @@ device override → stream override → global profile. The policy provides the
 criteria weights directly or derives them from the AHP matrix. The pipeline
 then evaluates timeliness, completeness, correctness, resolution, and
 significance; detects PII; applies strict privacy controls; and calculates the
-paper’s Edge and Cloud scores. A tie recommends Both.
+paper’s Edge and Cloud scores. A tie recommends Edge.
 
 ## Placement and persistence
 
 An Edge recommendation is retained in MongoDB `edge_records`. A Cloud
 recommendation writes to AWS Kinesis or Firehose only when AWS is configured;
 otherwise, or when that write fails, Q-PRIME retains the raw record in MongoDB
-`cloud_records` as a local Cloud fallback. A Both recommendation applies both
-active storage rules.
+`cloud_records` as a local Cloud fallback.
 
 Every placement also writes an immutable decision record containing the QoC
 scores, effective policy version, recommendation, actual backend, privacy

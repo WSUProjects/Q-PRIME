@@ -134,6 +134,7 @@ class QueryRouter:
                 cloud_rows = len(self._presto(self._rewrite(expression, "cloud_records")))
             sources = ["presto:mongodb.edge_records", "presto:mongodb.cloud_records"]
 
+        results = self._project_legacy_tiers(results, expression)
         elapsed = round((time.perf_counter() - started) * 1000, 3)
         metric = {
             "created_at": int(time.time() * 1000),
@@ -154,6 +155,25 @@ class QueryRouter:
             "query_latency_ms": elapsed,
             "sources": sources,
         }
+
+    @staticmethod
+    def _project_legacy_tiers(
+        rows: List[Dict[str, Any]], expression: exp.Expression
+    ) -> List[Dict[str, Any]]:
+        tier_keys = {"recommended_tier"}
+        for selection in getattr(expression, "selects", ()):  # SELECT and set operations
+            source = selection.this if isinstance(selection, exp.Alias) else selection
+            if isinstance(source, exp.Column) and source.name.lower() == "recommended_tier":
+                tier_keys.add(selection.alias_or_name.lower())
+
+        projected = []
+        for row in rows:
+            item = dict(row)
+            for key, value in row.items():
+                if key.lower() in tier_keys and str(value).lower() == "both":
+                    item[key] = "edge"
+            projected.append(item)
+        return projected
 
     def _validate(self, sql: str) -> exp.Expression:
         text = str(sql or "").strip()

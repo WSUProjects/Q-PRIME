@@ -87,7 +87,7 @@ class PlacementPipeline:
         actual_backends: List[str] = []
         storage_details: List[Dict[str, Any]] = []
 
-        if recommendation in {"edge", "both"}:
+        if recommendation == "edge":
             fields = {
                 "source": source,
                 "storage_location": "edge",
@@ -99,7 +99,7 @@ class PlacementPipeline:
             actual_backends.append("mongodb_edge")
             storage_details.append(fields)
 
-        if recommendation in {"cloud", "both"}:
+        if recommendation == "cloud":
             cloud_fields = self._store_cloud(record, analysis, source)
             actual_backends.append(cloud_fields["actual_backend"])
             storage_details.append(cloud_fields)
