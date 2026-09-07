@@ -25,7 +25,9 @@ def _collect(obj: Any, prefix: str = "") -> List[str]:
             if isinstance(value, dict):
                 keys.extend(_collect(value, new_prefix))
             elif isinstance(value, list) and value and isinstance(value[0], dict):
-                keys.extend(_collect(value[0], new_prefix))
+                # Mark object arrays explicitly so presence checks can inspect
+                # fields on any element rather than treating the list as a dict.
+                keys.extend(_collect(value[0], f"{new_prefix}[]"))
             else:
                 keys.append(new_prefix)
     return keys
@@ -53,12 +55,27 @@ def reset_baselines() -> None:
 
 
 def _has_path(obj: Any, path: str) -> bool:
-    current = obj
-    for part in path.split("."):
-        if not isinstance(current, dict) or part not in current:
+    parts = path.split(".") if path else []
+
+    def visit(current: Any, index: int) -> bool:
+        if index == len(parts):
+            return True
+        if isinstance(current, list):
+            return any(visit(item, index) for item in current)
+        if not isinstance(current, dict):
             return False
-        current = current[part]
-    return True
+        part = parts[index]
+        if part.endswith("[]"):
+            key = part[:-2]
+            values = current.get(key)
+            if not isinstance(values, list) or not values:
+                return False
+            return any(visit(item, index + 1) for item in values)
+        if part not in current:
+            return False
+        return visit(current[part], index + 1)
+
+    return visit(obj, 0)
 
 
 def _value_at(obj: Any, path: str) -> Any:
@@ -102,8 +119,9 @@ def _find_expected(stream_key: str, config: Dict[str, Any]) -> List[str]:
     if isinstance(configured, list) and configured:
         return [str(path) for path in configured]
     schemas = expected_keys()
-    if stream_key in schemas:
-        return schemas[stream_key]
+    schema_key = {"tello_vision": "drone"}.get(stream_key, stream_key)
+    if schema_key in schemas:
+        return schemas[schema_key]
     for key, fields in schemas.items():
         if key in stream_key or stream_key in key:
             return fields

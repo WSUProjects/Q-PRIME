@@ -42,3 +42,29 @@ def test_heartbeat_is_low_significance(sample_records):
     door["contextValue"] = dict(door["contextValue"], event="heartbeat")
     s = sla.compute_slas(door, _cfg())
     assert s["significance"]["score"] == 0.2
+
+
+def test_default_correctness_rules_reject_invalid_sensor_values(sample_records):
+    thp = dict(next(r for r in sample_records if r["contextAttribute"] == "thp"))
+    valid = sla.compute_slas(thp, _cfg())
+
+    thp["contextValue"] = dict(thp["contextValue"], humidity=150)
+    invalid = sla.compute_slas(thp, _cfg())
+
+    assert valid["correctness"]["checks_total"] > 1
+    assert invalid["correctness"]["score"] < valid["correctness"]["score"]
+
+
+def test_completeness_resolves_tello_schema_and_array_paths(sample_records):
+    tello = dict(next(r for r in sample_records if r["contextAttribute"] == "tello_vision"))
+    expected = sla._find_expected("tello_vision", _cfg())
+
+    assert "contextValue.detections[].name" in expected
+    full = sla.compute_slas(tello, _cfg())
+
+    tello["contextValue"] = dict(tello["contextValue"])
+    tello["contextValue"]["detections"] = [dict(tello["contextValue"]["detections"][0])]
+    del tello["contextValue"]["detections"][0]["name"]
+    partial = sla.compute_slas(tello, _cfg())
+
+    assert partial["completeness"]["score"] < full["completeness"]["score"]

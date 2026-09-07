@@ -25,6 +25,34 @@
         "smoke": 0.1,
         "camera_vision": 0.7
     },
+    "correctness_rules": {
+        "door": [
+            {"path": "contextValue.battery", "type": "number", "min": 0, "max": 100},
+            {"path": "contextValue.contact", "type": "boolean"},
+            {"path": "contextValue.state", "type": "string"}
+        ],
+        "thp": [
+            {"path": "contextValue.battery", "type": "number", "min": 0, "max": 100},
+            {"path": "contextValue.humidity", "type": "number", "min": 0, "max": 100},
+            {"path": "contextValue.temperature", "type": "number"},
+            {"path": "contextValue.pressure", "type": "number"}
+        ],
+        "misty_vision": [
+            {"path": "contextValue.distance", "type": "number", "min": 0},
+            {"path": "contextValue.pitch", "type": "number"},
+            {"path": "contextValue.yaw", "type": "number"},
+            {"path": "contextValue.event", "type": "string"}
+        ],
+        "zed_vision": [
+            {"path": "contextValue.count", "type": "number", "min": 0},
+            {"path": "contextValue.event", "type": "string"}
+        ],
+        "tello_vision": [
+            {"path": "contextValue.human_count", "type": "number", "min": 0},
+            {"path": "contextValue.detections", "type": "array"},
+            {"path": "contextValue.is_pushed", "type": "boolean"}
+        ]
+    },
     "weight_mode": "per_sensor",
     "criteria_weights": {
         "zed_vision": { "temporal": 0.3, "spatial": 0.3, "privacy": 0.4 },
