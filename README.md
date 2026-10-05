@@ -22,8 +22,8 @@ Requirements: Docker 24+ with Compose v2, and about 10 GB free disk.
 ### 1. Start the stack
 
 ```bash
-git clone https://github.com/JahedulAnowar/Q-PRIME-2026.git
-cd Q-PRIME-2026
+git clone https://github.com/WSUProjects/Q-PRIME.git
+cd Q-PRIME
 docker compose up -d --build
 ```
 
@@ -448,7 +448,22 @@ documents/           # architecture, device and metric notes, plus screenshots
 
 If you use Q-PRIME, please cite the paper — see [CITATION.cff](CITATION.cff):
 
-> K. S. Jagarlamudi *et al.*, "A Quality- and Privacy-Aware Edge–Cloud Continuum
-> Framework for Internet of Things Applications", *IEEE Access* (under review), 2026.
+> Jagarlamudi, K.S., Anowar, J., Islam, K., Mirhakimi, F., Calheiros, R.N. and
+> Javadi, B., 2026. A Quality and Privacy-Aware Edge-Cloud Continuum Framework for
+> Internet of Things Applications. *IEEE Access*, 14.
+> [doi:10.1109/ACCESS.2026.3737473](https://doi.org/10.1109/ACCESS.2026.3737473)
+
+```bibtex
+@article{jagarlamudi2026qprime,
+  author    = {Jagarlamudi, K. S. and Anowar, J. and Islam, K. and Mirhakimi, F. and Calheiros, R. N. and Javadi, B.},
+  title     = {A Quality and Privacy-Aware Edge-Cloud Continuum Framework for Internet of Things Applications},
+  journal   = {IEEE Access},
+  volume    = {14},
+  year      = {2026},
+  publisher = {IEEE},
+  issn      = {2169-3536},
+  doi       = {10.1109/ACCESS.2026.3737473}
+}
+```
 
 Licensed under the [MIT License](LICENSE).

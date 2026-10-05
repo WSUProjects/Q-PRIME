@@ -1,21 +1,38 @@
 cff-version: 1.2.0
 message: "If you use Q-PRIME in your research, please cite the paper below."
-title: "Q-PRIME: A Quality- and Privacy-Aware Edge-Cloud Continuum Framework for Internet of Things Applications"
+title: "Q-PRIME: A Quality and Privacy-Aware Edge-Cloud Continuum Framework for Internet of Things Applications"
 type: software
 authors:
   - family-names: "Jagarlamudi"
     given-names: "Kanaka Sai"
     affiliation: "Western Sydney University"
-repository-code: "https://github.com/JahedulAnowar/Q-PRIME-2026"
+repository-code: "https://github.com/WSUProjects/Q-PRIME"
 license: MIT
 version: "1.0.0"
 date-released: "2026-07-28"
 preferred-citation:
   type: article
-  title: "A Quality- and Privacy-Aware Edge-Cloud Continuum Framework for Internet of Things Applications"
+  title: "A Quality and Privacy-Aware Edge-Cloud Continuum Framework for Internet of Things Applications"
   authors:
     - family-names: "Jagarlamudi"
       given-names: "Kanaka Sai"
-      affiliation: "Western Sydney University"
-  journal: "IEEE Access (under review)"
+    - family-names: "Anowar"
+      given-names: "Jahedul"
+    - family-names: "Islam"
+      given-names: "Koushikur"
+    - family-names: "Mirhakimi"
+      given-names: "Fatemeh"
+    - family-names: "Calheiros"
+      given-names: "Rodrigo N."
+    - family-names: "Javadi"
+      given-names: "Bahman"
+  journal: "IEEE Access"
+  volume: 14
   year: 2026
+  month: 9
+  date-published: "2026-09-28"
+  publisher:
+    name: "IEEE"
+  issn: "2169-3536"
+  doi: "10.1109/ACCESS.2026.3737473"
+  url: "https://doi.org/10.1109/ACCESS.2026.3737473"

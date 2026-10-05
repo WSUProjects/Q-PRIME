@@ -2,9 +2,10 @@
 
 This package implements the Q-PRIME analysis algorithm described in:
 
-    K. S. Jagarlamudi et al., "A Quality- and Privacy-Aware Edge-Cloud
-    Continuum Framework for Internet of Things Applications",
-    submitted to IEEE Access, 2026.
+    K. S. Jagarlamudi, J. Anowar, K. Islam, F. Mirhakimi, R. N. Calheiros
+    and B. Javadi, "A Quality and Privacy-Aware Edge-Cloud Continuum
+    Framework for Internet of Things Applications", IEEE Access, vol. 14,
+    2026. doi:10.1109/ACCESS.2026.3737473
 
 Modules
 -------
